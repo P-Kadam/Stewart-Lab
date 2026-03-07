@@ -9,13 +9,14 @@ from scipy.interpolate import interp1d
 sns.set(style="whitegrid")
 
 
-def plot_interpolated_histogram(dfs, theta_value, condition_list, filename, armNums):
+def plot_interpolated_histogram(dfs, theta_value, condition, condition_list, filename, armNums):
     """
     Produces an interpolated histogram plot for selected data points and prints statistics.
 
     Args:
         dfs (list[pd.DataFrame]): List of DataFrames containing angle data
         theta_value (int): the angle (between which arms) to plot
+        condition (string): 'T' for temperature or 'S' for monovalent salt concentration
         condition_list (list): Conditions corresponding to each df in dfs
         filename (str): Filename to save the graph under
 
@@ -32,6 +33,14 @@ def plot_interpolated_histogram(dfs, theta_value, condition_list, filename, armN
     stdev = []
     min_val = []
     max_val = []
+    
+    # selecting the condition to be graphed
+    if condition == 'T':
+        condition_label = "°C"
+    elif condition == 'S':
+        condition_label = "M"
+    else:
+        return ValueError("You must enter the proper condition 'C' or 'S'!")
 
     #keeps track of the index, and extracts the exact dataframe
     for i, df in enumerate(dfs):
@@ -86,7 +95,7 @@ def plot_interpolated_histogram(dfs, theta_value, condition_list, filename, armN
         # Plot
         # °C
         plt.plot(
-            x_dense, y_dense,plotstyle, markerfacecolor='none', zorder=4, label=f"{condition_list[i]} °C")
+            x_dense, y_dense,plotstyle, markerfacecolor='none', zorder=4, label=f"{condition_list[i]} {condition_label}")
 
     plt.rcParams["font.family"] = "Times New Roman"
     # Axis labels and legend

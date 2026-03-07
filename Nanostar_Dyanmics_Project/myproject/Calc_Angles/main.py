@@ -7,9 +7,14 @@ def calc_angles(dataframes, topFile, SE, armNums, SEspacer, coreSpacer):
 
     Args:
         dataframes (list[pd.DataFrames]): List of DataFrames containing particle positions.
+        topFile (string): topology file name/path
+        SE (int): number of nucleotides that make the sticky end
+        armNums (int): nanostar valency
+        SEspacer (int): number of nucleotides that make up the sticky end spacer
+        coreSpacer (int): number of nucleotides that make up the core spacer
 
     Returns:
-        list of angles for each theta value at each time point
+        pd.Dataframe of angles for each theta value at each time point
     """
 
     avg_core_indecies, end_indecies = _find_arm_indecies(topFile, SE, armNums, SEspacer, coreSpacer)
