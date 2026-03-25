@@ -1,5 +1,7 @@
 import pandas as pd
 import statistics
+import subprocess
+from oxDNA_analysis_tools.align import align
 
 def read_trajectory(filepath):
 
@@ -16,6 +18,67 @@ def read_trajectory(filepath):
     """
 
     data =  pd.read_csv(filepath, usecols=range(3), sep=" ", header = None) 
+    return data
+
+#fixed - allegedly 
+
+def align_trajectory(filepath, parsed_file_name, aligned_traj_name):
+
+    """ 
+    
+    Reads the csv file data, aligns the trajectories, and pares off the first 10% of the data
+
+    Args:
+        filename (str): the path to the file
+        parsed_file_name (str): name of the parsed trajectory output file
+        aligned_traj_name (str): name of the aligned trajectory output file
+
+    Returns:
+        pd.DataFrame containing all the aligned data
+
+    """
+
+    with open(filepath, 'r') as file:
+        with open(parsed_file_name, 'w') as f:
+
+            switch = False
+
+            #iterates through each line of content within the file
+            for line in file:
+        
+                #modify this if (1) number of steps sims ran for changes OR (2) if you want more/less than 10% of the data parsed
+                #checks whether 10% of data has been read
+                if "t = 10010000" in line:
+        
+                    #indicates that the 10% mark has been hit
+                    switch = True
+        
+                    #uncomment if you want new file to contain t = headers that start at the step count 10000
+                    
+                    # f.write("t = " + str(t_counter) + "\n")
+                    # t_counter += 10000
+                    # continue
+        
+                #if the 10% mark has been hit
+                if switch == True:
+        
+                    #uncomment if you want new file to contain t = headers that start at the step count 10000
+                    
+                    # if "t =" in line:
+                        # f.write("t = " + str(t_counter) + "\n")
+                        # t_counter += 10000
+                        # continue
+        
+                    #writes the content in the new file
+                    f.write(line)
+
+    
+    #aligns the trajectory with now the reference frame being the first frame from the 10% removed data
+    aligned_trajectory = align(parsed_file_name, aligned_traj_name)
+
+    #reads the data into a dataframe
+    data =  pd.read_csv(aligned_traj_name, usecols=range(3), sep=" ", header = None)  
+
     return data
 
 def create_dataframes_by_timestamp(data):
