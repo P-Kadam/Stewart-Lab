@@ -7,3 +7,6 @@ __pycache__/
 data/
 *.dat
 *.pyidx
+*.npy
+*png
+*txt
