@@ -10,3 +10,4 @@ data/
 *.npy
 *png
 *txt
+*json
