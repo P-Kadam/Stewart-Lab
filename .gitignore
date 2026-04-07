@@ -1,2 +1,14 @@
 .DS_Store
 /Stewart-Lab/.DS_Store
+*.code-workspace
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+data/
+*.dat
+*.pyidx
+*.npy
+*png
+*txt
+*json
+*csv
