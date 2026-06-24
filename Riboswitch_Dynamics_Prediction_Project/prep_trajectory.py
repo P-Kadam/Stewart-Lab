@@ -1,4 +1,5 @@
 from prep_trajectory_helpers import *
+from pathlib import Path
 
 
 def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms, conformation, temp_condition, salt_concentration):
@@ -19,18 +20,35 @@ def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms,
 
     #create a list to store all the formatted trajectories
     trajectories = []
-    
+
+    #every replicate runs the same number of steps and the same fraction is
+    #parsed from each, so complete aligned files share an identical line count.
+    #if a prior run already produced a complete set, reuse them so an
+    #interrupted run can resume without re-parsing and re-aligning.
+    aligned_folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files/parsed_aligned_trajectory_files")
+    aligned_filepaths = [str(aligned_folder / name) for name in aligned_traj_names]
+    reuse = aligned_files_reusable(aligned_filepaths)
+
+    if reuse:
+        if aligned_folder / "averaged_trajectory.csv".is_file():
+            print("☑️ INFO: Found a complete set of aligned trajectories and an averaged trajectory - reusing them.")
+            avg_traj = pd.read_csv(aligned_folder / "averaged_trajectory.csv")
+            return avg_traj
+        else:
+            print("☑️ INFO: Found a complete set of aligned trajectories - reusing them.")
+
     #iterates through specific range to produce correct numbers corresponding to trail number
     for i in range(len(filepaths)):
 
         #adds the unformatted trajectory to a temporary variable
-        temp_traj= align_trajectory(filepaths[i], 
+        temp_traj= align_trajectory(filepaths[i],
                                     parsed_traj_names[i],
                                     aligned_traj_names[i],
                                     arms,
                                     conformation,
                                     temp_condition,
-                                    salt_concentration)
+                                    salt_concentration,
+                                    reuse)
 
         #formats the trajectory and appends it to the list of trajectories
         trajectories.append(create_dataframes_by_timestamp(temp_traj))
@@ -40,6 +58,8 @@ def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms,
 
     #calls function to create a df with averaged positional values
     avg_traj = average_values(trajectories[0], trajectories[1], trajectories[2])
+    avg_traj.to_csv(aligned_folder / "averaged_trajectory.csv", index=False)
+    print("☑️ INFO: Averaged trajectory has been created and saved.")
 
     return avg_traj
 

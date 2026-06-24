@@ -129,3 +129,19 @@ def average_energy_files(parsed_energy_dfs, averaged_energy_filename, arms, conf
     averaged_energy_df.to_csv(file_path, index=False)
 
     return averaged_energy_df
+
+def count_lines(filepath):
+    """
+    Counts the number of lines in a file.
+
+    Args:
+        filepath (str): The path to the file.
+
+    Returns:
+        int: The number of lines in the file, or None if the file does not exist.
+    """
+    try:
+        with open(filepath, 'r') as f:
+            return sum(1 for _ in f)
+    except FileNotFoundError:
+        return None

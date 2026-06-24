@@ -67,7 +67,7 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
     try:
         # Step 6: Calculate the average contact map value and add to dataframe
         data_df = contact_map(trajectory_filepaths, 
-                          f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/{arms}NS_RNC_{conformation}_{temp_condition}C_{salt_concentration}M_relaxed_3.top", 
+                          f"/Volumes/Seagate Backup Plus Drive/Pradnya_Research/Riboswitch_Manuscript/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/{arms}NS_RNC_{conformation}_{temp_condition}C_{salt_concentration}M_relaxed_3.top", 
                           data_df,
                           traj_length)
     except TypeError as e:

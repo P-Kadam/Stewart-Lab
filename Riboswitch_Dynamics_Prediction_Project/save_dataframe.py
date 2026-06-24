@@ -9,7 +9,7 @@ def save_dataframe_to_csv(data_df, filename, arms, conformation, temp_condition,
     filename (str): The name of the CSV file to save the DataFrame to.
     """
 
-    folder = Path(f"/Volumes/Seagate Backup Plus Drive/Pradnya_Research/Riboswitch_Manuscript/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files")
+    folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files")
     
     # Create the compiled_data folder if it doesn't already exist
     folder.mkdir(parents=True, exist_ok=True) 

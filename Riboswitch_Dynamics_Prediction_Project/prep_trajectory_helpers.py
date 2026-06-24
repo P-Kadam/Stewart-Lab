@@ -18,12 +18,64 @@ def read_trajectory(filepath):
 
     """
 
-    data =  pd.read_csv(filepath, usecols=range(3), sep=" ", header = None) 
+    data =  pd.read_csv(filepath, usecols=range(3), sep=" ", header = None)
     return data
 
-#fixed - allegedly 
 
-def align_trajectory(filepath, parsed_file_name, aligned_traj_name, arms, conformation, temp_condition, salt_concentration):
+def count_lines(filepath):
+
+    """
+    Counts the number of lines in a file.
+
+    Args:
+        filepath (str | Path): the path to the file
+
+    Returns:
+        int: the number of lines, or None if the file is missing/empty.
+    """
+
+    path = Path(filepath)
+
+    if not path.exists() or path.stat().st_size == 0:
+        return None
+
+    with open(path, 'r') as fh:
+        return sum(1 for _ in fh)
+
+
+def aligned_files_reusable(aligned_filepaths):
+
+    """
+    Decides whether previously generated aligned trajectory files can be reused
+    so an interrupted run can resume without re-parsing and re-aligning.
+
+    Every replicate runs for the same number of steps and the same fraction is
+    parsed from each, so a complete aligned file has an identical line count
+    across all three triplicates. If all files exist and share the same nonzero
+    line count, none were truncated by an interrupt and they can be reused. A
+    mismatch (or a missing file) means at least one is incomplete, so everything
+    is rebuilt from scratch.
+
+    Args:
+        aligned_filepaths (list): paths to the aligned trajectory files
+
+    Returns:
+        bool: True if the aligned files can be safely reused.
+    """
+
+    counts = [count_lines(p) for p in aligned_filepaths]
+
+    #any missing/empty file means we cannot reuse
+    if any(c is None for c in counts):
+        return False
+
+    #all triplicates must have the same line count to be considered complete
+    return len(set(counts)) == 1
+
+
+#fixed - allegedly
+
+def align_trajectory(filepath, parsed_file_name, aligned_traj_name, arms, conformation, temp_condition, salt_concentration, reuse=False):
 
     """ 
     
@@ -42,13 +94,21 @@ def align_trajectory(filepath, parsed_file_name, aligned_traj_name, arms, confor
     folder1 = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files/parsed_trajectory_files")
     folder2 = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files/parsed_aligned_trajectory_files")
 
-    # Create the compiled_data folder if it doesn't already exist
-    folder1.mkdir(parents=True, exist_ok=True) 
-    folder2.mkdir(parents=True, exist_ok=True) 
-
-
     filename1 = parsed_file_name
     file_path1 = folder1 / filename1
+
+    filename2 = aligned_traj_name
+    file_path2 = folder2 / filename2
+
+    #if a complete aligned file already exists, skip the expensive parse + align
+    #and just read it back so an interrupted run can resume
+    if reuse and file_path2.exists():
+        print(f"☑️ INFO: Reusing existing aligned trajectory '{filename2}' (skipping parse + align).")
+        return pd.read_csv(str(file_path2), usecols=range(3), sep=" ", header = None)
+
+    # Create the compiled_data folder if it doesn't already exist
+    folder1.mkdir(parents=True, exist_ok=True)
+    folder2.mkdir(parents=True, exist_ok=True)
 
     with open(filepath, 'r') as file:
         with open(file_path1, 'w') as f:
@@ -83,9 +143,6 @@ def align_trajectory(filepath, parsed_file_name, aligned_traj_name, arms, confor
         
                     #writes the content in the new file
                     f.write(line)
-
-    filename2 = aligned_traj_name
-    file_path2 = folder2 / filename2
 
     #aligns the trajectory with now the reference frame being the first frame from the 10% removed data
     aligned_trajectory = align(str(file_path1), str(file_path2))
