@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 
-def calc_RMSD(averaged_dfs, data_df, arms, conformation, temp_condition, salt_concentration):
+def calc_RMSD(averaged_dfs, data_df):
 
+#removed  arms, conformation, temp_condition, salt_concentration from the function arguments since they are not being used in the function -- can add back if we want to save the RMSD values as a separate csv file with those parameters in the name
     """
     Calculates the RMSD
 
@@ -46,7 +47,9 @@ def calc_RMSD(averaged_dfs, data_df, arms, conformation, temp_condition, salt_co
 
     data_df['RMSD (Å)'] *= 8.518
 
-    data_df.to_csv(f"{arms}NS_{conformation}_{temp_condition}_{salt_concentration}_test.csv")
+    # data_df.to_csv(f"{arms}NS_{conformation}_{temp_condition}_{salt_concentration}_test.csv")
+
+    print("INFO: RMSD has been calculated and added to the dataframe.")
     
     return data_df
     

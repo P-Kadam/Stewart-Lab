@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 def read_energy_file(energy_filepath):
 
@@ -16,21 +17,17 @@ def read_energy_file(energy_filepath):
 
     """
     
-    #open the energy file and specify to read it
-    energy_file = open(energy_filepath, 'r')
-
     store_dt = []
     store_PE = []
     store_KE = []
     store_TE = []
 
     store_entry = []
-    
-    for line in energy_file:
-        temp_line = line.strip()
-        store_entry += temp_line.split()
 
-    energy_file.close()
+    with open(energy_filepath, 'r') as energy_file:
+        for line in energy_file:
+            temp_line = line.strip()
+            store_entry += temp_line.split()
 
     for i in range(len(store_entry)):
         if i % 4 == 0:
@@ -51,10 +48,10 @@ def read_energy_file(energy_filepath):
 
 
 
-def parse_energies(energy_entries, parsed_energy_filename):
+def parse_energies(energy_entries, parsed_energy_filename, arms, conformation, temp_condition, salt_concentration):
 
     """
-    Removes initial 10% of the averaged energy dataframe and saves the parsed energy values as a new csv file
+    Removes initial unequilibrated portion of the averaged energy dataframe and saves the parsed energy values as a new csv file
 
     Args:
 
@@ -69,18 +66,25 @@ def parse_energies(energy_entries, parsed_energy_filename):
 
     dt, PE, KE, TE = energy_entries
 
-    parsed_energy_df = pd.DataFrame({"dt" : dt[1001: ],
-                                     "Potential Energy (SU)" : PE[1001: ],
-                                     "Kinetic Energy (SU)" : KE[1001: ],
-                                     "Total Energy (SU)" : TE[1001: ]
+    parsed_energy_df = pd.DataFrame({"dt" : dt[6667: ],
+                                     "Potential Energy (SU)" : PE[6667: ],
+                                     "Kinetic Energy (SU)" : KE[6667: ],
+                                     "Total Energy (SU)" : TE[6667: ]
                                     })
 
-    parsed_energy_df.to_csv(f"parsed_energy_{parsed_energy_filename}.csv")
+    folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files/parsed_energy_files")
+    
+    # Create the compiled_data folder if it doesn't already exist
+    folder.mkdir(parents=True, exist_ok=True) 
+    filename = f"parsed_energy_{parsed_energy_filename}.csv"
+    file_path = folder / filename
+
+    parsed_energy_df.to_csv(file_path, index=False)
     
     return parsed_energy_df
 
 
-def average_energy_files(parsed_energy_dfs, averaged_energy_filename):
+def average_energy_files(parsed_energy_dfs, averaged_energy_filename, arms, conformation, temp_condition, salt_concentration):
 
     """
     Calculates the average of the energy values across multiple parsed energy dataframes and 
@@ -114,8 +118,14 @@ def average_energy_files(parsed_energy_dfs, averaged_energy_filename):
                               "Potential Energy (SU)" : avg_PE, 
                               "Kinetic Energy (SU)" : avg_KE, 
                               "Total Energy (SU)" : avg_TE})
+    
+    folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files")
+    
+    # Create the compiled_data folder if it doesn't already exist
+    folder.mkdir(parents=True, exist_ok=True) 
+    filename = f"averaged_energy_{averaged_energy_filename}"
+    file_path = folder / filename
 
-    averaged_energy_df.to_csv(f"averaged_energy_{averaged_energy_filename}.csv")
+    averaged_energy_df.to_csv(file_path, index=False)
 
     return averaged_energy_df
-    

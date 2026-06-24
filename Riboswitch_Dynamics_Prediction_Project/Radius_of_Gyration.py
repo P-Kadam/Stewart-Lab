@@ -1,7 +1,7 @@
 from Calc_COM import *
 import math
 
-def calc_radius_of_gyration(averaged_dfs, COM_df, arms, conformation, temp_condition, salt_concentration):
+def calc_radius_of_gyration(averaged_dfs, COM_df, data_df):
 
     """
     Calculates the Radius of Gyration for each time point 
@@ -54,15 +54,29 @@ def calc_radius_of_gyration(averaged_dfs, COM_df, arms, conformation, temp_condi
         Rg_z *= 0.8518
 
         #store the values of interest along with simulation code, number of arms, temperature condition, and salt concentration in a list
-        temp_Rg.append([f"{arms}NS_{conformation}_{temp_condition}_{salt_concentration}", arms, conformation, temp_condition, salt_concentration, std_Rg, Rg_x, Rg_y, Rg_z])
+        # temp_Rg.append([f"{arms}NS_{conformation}_{temp_condition}_{salt_concentration}", arms, conformation, temp_condition, salt_concentration, std_Rg, Rg_x, Rg_y, Rg_z])
+        temp_Rg.append([std_Rg, Rg_x, Rg_y, Rg_z])
     
+    std_Rg_vals = [item[0] for item in temp_Rg]
+    Rg_x_vals = [item[1] for item in temp_Rg]
+    Rg_y_vals = [item[2] for item in temp_Rg]
+    Rg_z_vals = [item[3] for item in temp_Rg]        
+        
+    #re-fromat temo_Rg to all column data in one list
+    data_df["Standard Rg (nm)"] = std_Rg_vals
+    data_df["Rg_X (nm)"] = Rg_x_vals
+    data_df["Rg_Y (nm)"] = Rg_y_vals
+    data_df["Rg_Z (nm)"] = Rg_z_vals
+
     # Use list of coordinates to create a df for the trajectory
-    Rg_df = pd.DataFrame(temp_Rg)
+    # Rg_df = pd.DataFrame(temp_Rg)
    
     #add column names
-    Rg_df.columns = ['Simulation Code', 'Arms', 'Configuration', 'Temperature Condition (°C)', 'Salt Concentration (M)', 'Standard Rg (nm)', 'Rg_X (nm)', 'Rg_Y (nm)', 'Rg_Z (nm)']
+    # Rg_df.columns = ['Simulation Code', 'Arms', 'Configuration', 'Temperature Condition (°C)', 'Salt Concentration (M)', 'Standard Rg (nm)', 'Rg_X (nm)', 'Rg_Y (nm)', 'Rg_Z (nm)']
 
     # Rg_df.to_csv(f"{arms}NS_{conformation}_{temp_condition}_{salt_concentration}_test.csv")
 
-    return Rg_df
+    print("INFO: Radius of gyration has been calculated and added to the dataframe.")
+
+    return data_df
     

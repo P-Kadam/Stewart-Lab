@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def calc_COM_nonuniform_structure(averaged_dfs, arms):
+def calc_COM_nonuniform_structure(averaged_dfs):
 
     """
     Calculates the center of mass of an irregular RNA structure (not a nanostar)
@@ -16,6 +16,8 @@ def calc_COM_nonuniform_structure(averaged_dfs, arms):
         pd.DataFrames that contain center of mass coordinates, with each index corresponding to the timepoint in the trajectory
 
     """
+
+    print("\n ☑️ INFO: COM calculation initiated!")
 
     timept_COM_coords = []
 
@@ -44,6 +46,8 @@ def calc_COM_nonuniform_structure(averaged_dfs, arms):
    
     #add column names
     COM_df.columns = ['X', 'Y', 'Z']
+
+    print(" \n ☑️ INFO: Center of mass has been calculated for each timepoint in the trajectory.")
 
     # return the COM list
     return COM_df

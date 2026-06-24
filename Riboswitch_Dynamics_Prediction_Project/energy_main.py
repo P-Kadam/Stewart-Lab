@@ -1,6 +1,6 @@
 from energy_helpers import read_energy_file, parse_energies, average_energy_files
 
-def process_energies(energy_filepaths, parsed_energy_filenames, averaged_energy_filename, data_df):
+def process_energies(energy_filepaths, parsed_energy_filenames, averaged_energy_filename, data_df, arms, conformation, temp_condition, salt_concentration):
     """
     Reads in energy files, parses the energy values, averages the energy values across multiple files, and adds the averaged energy values to an existing dataframe
 
@@ -19,12 +19,16 @@ def process_energies(energy_filepaths, parsed_energy_filenames, averaged_energy_
     for i, energy_filepath in enumerate(energy_filepaths):
 
         energy_entries = read_energy_file(energy_filepath)
-        parsed_energy_dfs.append(parse_energies(energy_entries, parsed_energy_filenames[i]))
+        parsed_energy_dfs.append(parse_energies(energy_entries, parsed_energy_filenames[i], arms, conformation, temp_condition, salt_concentration))
 
-    avg_energy_df = average_energy_files(parsed_energy_dfs, averaged_energy_filename)
+    avg_energy_df = average_energy_files(parsed_energy_dfs, averaged_energy_filename, arms, conformation, temp_condition, salt_concentration)
+
+    print(avg_energy_df)
 
     data_df["Potential Energy (SU)"] = avg_energy_df["Potential Energy (SU)"]
     data_df["Kinetic Energy (SU)"] = avg_energy_df["Kinetic Energy (SU)"]
     data_df["Total Energy (SU)"] = avg_energy_df["Total Energy (SU)"]
+
+    print("INFO: Energy values have been processed and added to the dataframe.")
 
     return data_df
