@@ -23,6 +23,7 @@ def calculate_contact_map(traj_filepath, top_filepath):
     top_info, traj_info = describe(top_filepath, traj_filepath)
 
     cm = contact_map(traj_info, top_info)
+    print("\n")
 
     # gets the upper triangle of the contact matrix - since it is symmetric
     indecies = np.triu_indices_from(cm, k=0)

@@ -21,15 +21,15 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
         #get length of the trajectory
         traj_length = len(trajectory)
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 1 (prep_trajectory_data) for inputs "
+        print(f"🛑ERROR: TypeError in Step 1 (prep_trajectory_data) for inputs "
               f"'{trajectory_filepaths}': {e}. Cannot continue without trajectory data.")
         return None
     
     try:
         # Step 2: Calculate the center of mass
-        COM_df = calc_COM_nonuniform_structure(trajectory, arms)
+        COM_df = calc_COM_nonuniform_structure(trajectory, arms, conformation, temp_condition, salt_concentration)
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 2 (calc_COM) for trajectory '{trajectory_filepaths}': {e}. "
+        print(f"🛑ERROR: TypeError in Step 2 (calc_COM) for trajectory '{trajectory_filepaths}': {e}. "
               f"Skipping COM calculation — Radius of Gyration will also be unavailable.")
         COM_df = None
 
@@ -38,7 +38,7 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
         data_df = create_dataframe(arms, conformation, temp_condition, salt_concentration, traj_length)
     
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 3 (create_dataframe): {e}. Cannot continue without a DataFrame.")
+        print(f"🛑ERROR: TypeError in Step 3 (create_dataframe): {e}. Cannot continue without a DataFrame.")
         return None
     
     try:
@@ -52,7 +52,7 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
         data_df = calc_switching_distance(dist_trajectory_filepaths, data_df)
 
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 4 (calc_switching_distance) for files "
+        print(f"🛑ERROR: TypeError in Step 4 (calc_switching_distance) for files "
               f"'{dist_trajectory_filepaths}': {e}. Skipping switching distance calculation.")
         
     try:
@@ -61,17 +61,17 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
                                 data_df, arms, conformation, temp_condition, 
                                salt_concentration)
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 5 (process_energies) for files '{energy_filepaths}': {e}. "
+        print(f"🛑ERROR: TypeError in Step 5 (process_energies) for files '{energy_filepaths}': {e}. "
               f"Skipping energy data processing.")
     
     try:
         # Step 6: Calculate the average contact map value and add to dataframe
         data_df = contact_map(trajectory_filepaths, 
-                          f"/Volumes/Seagate Backup Plus Drive/Pradnya_Research/Riboswitch_Manuscript/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/{arms}NS_RNC_{conformation}_{temp_condition}C_{salt_concentration}M_relaxed_3.top", 
+                          f"/Volumes/Seagate_Backup_Plus_Drive/Pradnya_Research/Riboswitch_Manuscript/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/{arms}NS_RNC_{conformation}_{temp_condition}C_{salt_concentration}M_relaxed_3.top", 
                           data_df,
                           traj_length)
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 6 (contact_map) for files '{trajectory_filepaths}': {e}. "
+        print(f"🛑ERROR: TypeError in Step 6 (contact_map) for files '{trajectory_filepaths}': {e}. "
               f"Skipping contact map calculation.")
         
     if COM_df is not None:
@@ -79,18 +79,18 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
             # Step 7: Calculate the radius of gyration and add to dataframe
             data_df = calc_radius_of_gyration(trajectory, COM_df, data_df)
         except TypeError as e:
-            print(f"ERROR: TypeError in Step 7 (calc_radius_of_gyration): {e}. "
+            print(f"🛑ERROR: TypeError in Step 7 (calc_radius_of_gyration): {e}. "
                   f"Skipping radius of gyration calculation.")
             
     else:
-        print("WARNING: Skipping Step 7 (calc_radius_of_gyration) because COM_df is unavailable.")
+        print("⚠️WARNING: Skipping Step 7 (calc_radius_of_gyration) because COM_df is unavailable.")
 
     try:
     
         save_dataframe_to_csv(data_df, f"compiled_data_{arms}RNC_{conformation}_{temp_condition}C_{salt_concentration}M.csv", 
                           arms, conformation, temp_condition, salt_concentration) # Save the dataframe before adding energy data so that we have a record of the trajectory-based data before adding energy data (in case there are any issues with the energy data processing)
     except TypeError as e:
-        print(f"ERROR: TypeError saving DataFrame after Step 7: {e}.")
+        print(f"🛑ERROR: TypeError saving DataFrame after Step 7: {e}.")
     
     
     try:
@@ -98,16 +98,16 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
         data_df = calc_RMSD(trajectory, data_df)
         
     except TypeError as e:
-        print(f"ERROR: TypeError in Step 8 (calc_RMSD): {e}. Skipping RMSD calculation.")
+        print(f"🛑ERROR: TypeError in Step 8 (calc_RMSD): {e}. Skipping RMSD calculation.")
     
     # Final save
     try:
         save_dataframe_to_csv(data_df, f"compiled_data_{arms}RNC_{conformation}_{temp_condition}C_{salt_concentration}M.csv",
                               arms, conformation, temp_condition, salt_concentration)
     except TypeError as e:
-        print(f"ERROR: TypeError during final save: {e}.")
+        print(f"🛑ERROR: TypeError during final save: {e}.")
 
-    print("INFO: Data compilation complete. 🎉")
+    print("INFO: Data compilation complete + data saved! 🎉")
     return data_df
     
 
