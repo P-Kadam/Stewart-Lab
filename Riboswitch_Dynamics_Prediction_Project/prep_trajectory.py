@@ -1,5 +1,7 @@
-from prep_trajectory_helpers import *
+# from prep_trajectory_helpers import *
+from prep_traj_helpers import *
 from pathlib import Path
+import pandas as pd
 
 
 def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms, conformation, temp_condition, salt_concentration):
@@ -30,9 +32,14 @@ def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms,
     reuse = aligned_files_reusable(aligned_filepaths)
 
     if reuse:
-        if aligned_folder / "averaged_trajectory.csv".is_file():
+        if (aligned_folder / "averaged_trajectory.csv").is_file():
             print("☑️ INFO: Found a complete set of aligned trajectories and an averaged trajectory - reusing them.")
-            avg_traj = pd.read_csv(aligned_folder / "averaged_trajectory.csv")
+            #the CSV is a flattened version of the list of per-frame DataFrames,
+            #with a "frame" column marking which frame each row belongs to;
+            #split it back into one DataFrame per frame to restore the original structure
+            flat = pd.read_csv(aligned_folder / "averaged_trajectory.csv")
+            avg_traj = [group.drop(columns="frame").reset_index(drop=True)
+                        for _, group in flat.groupby("frame", sort=True)]
             return avg_traj
         else:
             print("☑️ INFO: Found a complete set of aligned trajectories - reusing them.")
@@ -54,11 +61,16 @@ def prep_trajectory_data(filepaths, parsed_traj_names, aligned_traj_names, arms,
         trajectories.append(create_dataframes_by_timestamp(temp_traj))
         print("\n")
 
-    print("\n ☑️ INFO: Trajectory data has been prepared. Now averaging trajectories!")
+    print("☑️ INFO: Trajectory data has been prepared. Now averaging trajectories!")
 
     #calls function to create a df with averaged positional values
     avg_traj = average_values(trajectories[0], trajectories[1], trajectories[2])
-    avg_traj.to_csv(aligned_folder / "averaged_trajectory.csv", index=False)
+
+    #avg_traj is a list of per-frame DataFrames; flatten it into a single CSV by
+    #stacking the frames and tagging each row with its frame index so the list
+    #structure can be rebuilt on reuse (a plain DataFrame.to_csv would fail on a list)
+    flattened = pd.concat({i: df for i, df in enumerate(avg_traj)}, names=["frame"]).reset_index(level="frame")
+    flattened.to_csv(aligned_folder / "averaged_trajectory.csv", index=False)
     print("☑️ INFO: Averaged trajectory has been created and saved.")
 
     return avg_traj
