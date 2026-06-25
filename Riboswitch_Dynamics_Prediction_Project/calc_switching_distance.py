@@ -32,12 +32,12 @@ def calc_switching_distance(traj_filepaths, data_df):
     data1 = [dist[0][0][0], dist[1][0][0], dist[2][0][0]]
     data2 = [dist[0][0][1], dist[1][0][1], dist[2][0][1]]
 
-    mean1 = np.mean(data1, axis = 0)
-    mean2 = np.mean(data2, axis = 0)
+    mean1 = np.mean(data1, axis = 0)*0.8518  # Convert to nm
+    mean2 = np.mean(data2, axis = 0) *0.8518  # Convert to nm
 
     # # Add the calculated distances to the DataFrame as new columns
     data_df["P1 stem NT distance (nm)"] = mean1
-    data_df["anti-P1 stem NT distance (SU)"] = mean2
+    data_df["anti-P1 stem NT distance (nm)"] = mean2
 
     print("INFO: Switching distance calculation complete.")
 
