@@ -20,7 +20,7 @@ def calc_COM_nonuniform_structure(averaged_dfs, arms, conformation, temp_conditi
 
     folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arms}RNC/{conformation}/{temp_condition}C_{salt_concentration}M/compiled_data_files")
     if not (folder / "COM_df.csv").is_file():
-        print("\n ☑️ INFO: COM calculation initiated!")
+        print("☑️ INFO: COM calculation initiated!")
 
         timept_COM_coords = []
 
@@ -55,6 +55,7 @@ def calc_COM_nonuniform_structure(averaged_dfs, arms, conformation, temp_conditi
 
     else:
         print("☑️INFO: COM file already exists.")
+        print("\n")
         COM_df = pd.read_csv(folder / "COM_df.csv")
 
     # return the COM list

@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-def combine_data(filepaths):
+def combine_data(filepaths, arm):
     
     # Read in all the data files
     data_dfs = []
@@ -11,12 +11,12 @@ def combine_data(filepaths):
         if Path(fp).exists():
             df = pd.read_csv(fp)
 
-            if df.shape[0] == 9000:
+            if df.shape[0] == 13334:
                 data_dfs.append(df)
                 print(f"✅ Loaded: {fp} ({df.shape[0]} rows)")
             else:
                 print(f"❌ ERROR: Invalid length: {fp}")
-                print(f"   File length: {df.shape[0]} rows (expected 9000)")
+                print(f"   File length: {df.shape[0]} rows (expected 13334)")
                 skipped_files.append(fp)
         else:
             print(f"⚠️ WARNING: File not found, skipping: {fp}")
@@ -32,7 +32,7 @@ def combine_data(filepaths):
     # Combine all dataframes
     combined_df = pd.concat(data_dfs, ignore_index=True)
 
-    folder = Path("/Volumes/Stewart_Lab_External_Drive_PK/MCDB_198/combined_data")
+    folder = Path(f"/Users/pradnyakadam/Downloads/Riboswitch_Manuscript/data_compilation/{arm}RNC")
 
     # Create the combined_data folder if it doesn't already exist
     folder.mkdir(parents=True, exist_ok=True)

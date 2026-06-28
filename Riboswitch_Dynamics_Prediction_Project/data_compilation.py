@@ -108,6 +108,10 @@ def compile_data(trajectory_filepaths, parsed_trajectory_filenames, aligned_traj
         print(f"🛑ERROR: TypeError during final save: {e}.")
 
     print("INFO: Data compilation complete + data saved! 🎉")
+    print("----------------------------------------------------------------------")
+    print("\n")
+    print("\n")
+    
     return data_df
     
 
